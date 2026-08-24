@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Showcase Livelli Geometry Dash della Twix-KFC Society</title>
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    min-height: 100vh;
+    background: radial-gradient(circle at top, #2a0000 0%, #0a0000 60%, #000000 100%);
+    font-family: 'Segoe UI', Arial, sans-serif;
+    padding: 40px 20px;
+    color: #ffb3b3;
+  }
+
+  h1 {
+    text-align: center;
+    color: #ff3b3b;
+    text-shadow: 0 0 12px rgba(255, 0, 0, 0.8);
+    font-size: 1.9rem;
+    letter-spacing: 1px;
+    margin-bottom: 40px;
+    text-transform: uppercase;
+  }
+
+  #levels {
+    max-width: 900px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+  }
+
+  .level-card {
+    background: linear-gradient(160deg, #3b0000 0%, #1a0000 100%);
+    border: 2px solid #ff1e1e;
+    border-radius: 20px;
+    box-shadow: 0 0 40px rgba(255, 20, 20, 0.45), inset 0 0 30px rgba(255, 0, 0, 0.1);
+    padding: 25px;
+    text-align: center;
+  }
+
+  .level-card h2 {
+    color: #ff5c5c;
+    text-shadow: 0 0 10px rgba(255, 0, 0, 0.6);
+    font-size: 1.4rem;
+    margin-bottom: 16px;
+  }
+
+  video {
+    width: 100%;
+    border-radius: 12px;
+    border: 2px solid #ff1e1e33;
+    box-shadow: 0 0 25px rgba(255, 0, 0, 0.35);
+    display: block;
+    background: #000;
+  }
+
+  .difficulty {
+    margin-top: 20px;
+    padding: 14px 20px;
+    background: rgba(255, 30, 30, 0.12);
+    border: 1px solid #ff1e1e;
+    border-radius: 12px;
+    font-size: 1.05rem;
+    font-weight: bold;
+  }
+
+  .difficulty span {
+    color: #ff3b3b;
+    text-shadow: 0 0 8px rgba(255,0,0,0.6);
+  }
+
+  .empty, .status {
+    text-align: center;
+    color: #8a4a4a;
+    margin-top: 30px;
+    font-size: 0.95rem;
+  }
+
+  .footer {
+    text-align: center;
+    margin-top: 40px;
+    color: #8a4a4a;
+    font-size: 0.8rem;
+  }
+</style>
+</head>
+<body>
+
+  <h1>🔥 Showcase Livelli Geometry Dash della Twix-KFC Society 🔥</h1>
+
+  <div id="levels">
+    <p class="status">Caricamento livelli...</p>
+  </div>
+
+  <div class="footer">Hostato su GitHub Pages · Video via GitHub Releases</div>
+
+<script>
+  // ====== CONFIGURA QUESTI 3 VALORI ======
+  const OWNER = "Auriobello";          // il tuo username GitHub
+  const REPO = "gd_levels";            // il nome del repository
+  const RELEASE_TAG = "showcase-videos"; // il tag della release dove carichi i video
+  // ========================================
+
+  async function loadLevels() {
+    const container = document.getElementById('levels');
+    try {
+      const res = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/releases/tags/${RELEASE_TAG}`);
+      if (!res.ok) throw new Error('Release non trovata (controlla OWNER, REPO e RELEASE_TAG)');
+      const data = await res.json();
+      const assets = (data.assets || []).filter(a => a.name.toLowerCase().endsWith('.mp4'));
+
+      if (assets.length === 0) {
+        container.innerHTML = '<p class="empty">Nessun video trovato nella release. Caricane uno per iniziare.</p>';
+        return;
+      }
+
+      // Ordine: più recenti prima
+      assets.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+      container.innerHTML = '';
+      assets.forEach(asset => {
+        const { name, difficulty } = parseFilename(asset.name);
+        container.appendChild(createCard(name, difficulty, asset.browser_download_url));
+      });
+    } catch (err) {
+      container.innerHTML = `<p class="empty">Errore nel caricamento: ${escapeHtml(err.message)}</p>`;
+    }
+  }
+
+  // Estrae "Nome Livello" e "Difficoltà" dal nome del file.
+  // Convenzione: "Nome Livello - Difficoltà.mp4"
+  // Tutto ciò che sta dopo l'ULTIMO " - " è la difficoltà, il resto è il nome.
+  function parseFilename(filename) {
+    const base = filename.replace(/\.[^/.]+$/, ''); // rimuove estensione
+    const sepIndex = base.lastIndexOf(' - ');
+    if (sepIndex !== -1) {
+      const name = base.slice(0, sepIndex).trim();
+      const difficulty = base.slice(sepIndex + 3).trim();
+      return { name, difficulty };
+    }
+    return { name: base, difficulty: 'N/A' };
+  }
+
+  function createCard(name, difficulty, videoUrl) {
+    const card = document.createElement('div');
+    card.className = 'level-card';
+    card.innerHTML = `
+      <h2>${escapeHtml(name)}</h2>
+      <video controls preload="metadata">
+        <source src="${videoUrl}" type="video/mp4">
+        Il tuo browser non supporta il tag video.
+      </video>
+      <div class="difficulty">Difficoltà aspettata: <span>${escapeHtml(difficulty)}</span></div>
+    `;
+    return card;
+  }
+
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  loadLevels();
+</script>
+
+</body>
+</html>
