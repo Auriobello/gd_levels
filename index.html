@@ -139,8 +139,17 @@
   // Convenzione: "Nome Livello - Difficoltà.mp4"
   // Tutto ciò che sta dopo l'ULTIMO " - " è la difficoltà, il resto è il nome.
   function parseFilename(filename) {
-    const base = filename.replace(/\.[^/.]+$/, ''); // rimuove estensione
-    const sepIndex = base.lastIndexOf(' - ');
+    let base = filename.replace(/\.[^/.]+$/, ''); // rimuove estensione
+
+    // GitHub sostituisce gli spazi con punti nei nomi degli allegati delle release.
+    // Se non troviamo il separatore " - ", proviamo a convertire i punti in spazi
+    // e a cercarlo di nuovo.
+    let sepIndex = base.lastIndexOf(' - ');
+    if (sepIndex === -1) {
+      base = base.replace(/\./g, ' ').replace(/\s+/g, ' ').trim();
+      sepIndex = base.lastIndexOf(' - ');
+    }
+
     if (sepIndex !== -1) {
       const name = base.slice(0, sepIndex).trim();
       const difficulty = base.slice(sepIndex + 3).trim();
