@@ -378,7 +378,6 @@
     <h1>🔥 Showcase Livelli Geometry Dash 🔥</h1>
     <p class="subtitle">Le clip dei livelli, con chi li ha creati e chi li ha verificati.</p>
     <div class="pill-row">
-      <a class="repo-pill" id="repo-link" href="#" target="_blank" rel="noopener">📦 Vedi il repository su GitHub ↗</a>
       <a class="repo-pill app-pill" id="apk-link" href="#" target="_blank" rel="noopener">📱 Scarica l'app per Android ↓</a>
     </div>
   </header>
@@ -387,9 +386,9 @@
 
   <details class="naming-info">
     <summary>ℹ️ Come nominare i file video da caricare</summary>
-    <p>Per far comparire tutti i dettagli, carica ogni video su GitHub Releases con questo nome:</p>
-    <code>Nome Livello | Creatore | Verificatore | Difficoltà.mp4</code>
-    <p>Funzionano anche formati parziali: <code>Nome Livello | Creatore | Difficoltà.mp4</code> oppure il vecchio formato <code>Nome Livello - Difficoltà.mp4</code> (creatore e verificatore risulteranno "N/A").</p>
+    <p>Per far comparire tutti i dettagli, carica ogni video su GitHub Releases con questo nome (usa la tilde <code>~</code>, valida su tutti i sistemi operativi):</p>
+    <code>Nome Livello ~ Creatore ~ Verificatore ~ Difficoltà.mp4</code>
+    <p>Funzionano anche formati parziali: <code>Nome Livello ~ Creatore ~ Difficoltà.mp4</code> oppure il vecchio formato <code>Nome Livello - Difficoltà.mp4</code> (creatore e verificatore risulteranno "N/A").</p>
   </details>
 
   <div id="levels">
@@ -410,7 +409,6 @@
   const APK_URL = `https://github.com/${OWNER}/${REPO}/releases/download/app/society-levels.apk`;
   // ========================================
 
-  document.getElementById('repo-link').href = `https://github.com/${OWNER}/${REPO}`;
   document.getElementById('apk-link').href = APK_URL;
 
   if ('serviceWorker' in navigator) {
@@ -510,13 +508,13 @@
   }
 
   // Estrae nome, creatore, verificatore e difficoltà dal nome del file.
-  // Formato consigliato: "Nome Livello | Creatore | Verificatore | Difficoltà.mp4"
-  // Sono supportati anche formati parziali con "|" e il vecchio formato "Nome - Difficoltà.mp4"
+  // Formato consigliato: "Nome Livello ~ Creatore ~ Verificatore ~ Difficoltà.mp4"
+  // Sono supportati anche formati parziali con "~" e il vecchio formato "Nome - Difficoltà.mp4"
   function parseFilename(filename) {
     const base = filename.replace(/\.[^/.]+$/, '');
 
-    if (base.includes('|')) {
-      const parts = base.split('|').map(p => p.trim());
+    if (base.includes('~')) {
+      const parts = base.split('~').map(p => p.trim());
       if (parts.length >= 4) {
         return { name: parts[0], creator: parts[1] || 'N/A', verifier: parts[2] || 'N/A', difficulty: parts[3] || 'N/A' };
       }
