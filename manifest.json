@@ -1,6 +1,7 @@
 {
   "name": "Society Levels",
   "short_name": "Society Levels",
+  "id": "./",
   "description": "Showcase dei livelli Geometry Dash della Twix-KFC Society",
   "start_url": "./index.html",
   "scope": "./",
@@ -11,13 +12,7 @@
   "icons": [
     {
       "src": "img/apk.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "img/apk.png",
-      "sizes": "512x512",
+      "sizes": "636x638",
       "type": "image/png",
       "purpose": "any"
     }
