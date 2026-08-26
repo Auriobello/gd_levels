@@ -386,9 +386,9 @@
 
   <details class="naming-info">
     <summary>ℹ️ Come nominare i file video da caricare</summary>
-    <p>Per far comparire tutti i dettagli, carica ogni video su GitHub Releases con questo nome (usa la tilde <code>~</code>, valida su tutti i sistemi operativi):</p>
-    <code>Nome Livello ~ Creatore ~ Verificatore ~ Difficoltà.mp4</code>
-    <p>Funzionano anche formati parziali: <code>Nome Livello ~ Creatore ~ Difficoltà.mp4</code> oppure il vecchio formato <code>Nome Livello - Difficoltà.mp4</code> (creatore e verificatore risulteranno "N/A").</p>
+    <p>Per far comparire tutti i dettagli, carica ogni video su GitHub Releases con questo nome: usa l'underscore <code>_</code> al posto degli spazi dentro ogni campo, e il doppio trattino <code>--</code> tra un campo e l'altro (GitHub converte gli spazi in punti nel nome file salvato, quindi tilde e trattino singolo affiancati a uno spazio sparivano):</p>
+    <code>Nome_Livello--Creatore--Verificatore--Difficoltà.mp4</code>
+    <p>Funzionano anche formati parziali: <code>Nome_Livello--Creatore--Difficoltà.mp4</code> oppure il vecchio formato <code>Nome_Livello - Difficoltà.mp4</code> (creatore e verificatore risulteranno "N/A"). Restano supportati anche i file già caricati col vecchio formato a tilde <code>~</code>.</p>
   </details>
 
   <div id="levels">
@@ -508,11 +508,29 @@
   }
 
   // Estrae nome, creatore, verificatore e difficoltà dal nome del file.
-  // Formato consigliato: "Nome Livello ~ Creatore ~ Verificatore ~ Difficoltà.mp4"
-  // Sono supportati anche formati parziali con "~" e il vecchio formato "Nome - Difficoltà.mp4"
+  // Formato consigliato: "Nome_Livello--Creatore--Verificatore--Difficoltà.mp4"
+  // (GitHub Releases converte gli spazi in punti nel nome file salvato, quindi si usa
+  // l'underscore "_" al posto dello spazio e il doppio trattino "--" come separatore di campo)
+  // Sono supportati anche i vecchi formati con "~" e "Nome - Difficoltà.mp4" per compatibilità.
   function parseFilename(filename) {
     const base = filename.replace(/\.[^/.]+$/, '');
 
+    // Nuovo formato: doppio trattino "--" come separatore, underscore "_" come spazio
+    if (base.includes('--')) {
+      const parts = base.split('--').map(p => p.trim().replace(/_/g, ' '));
+      if (parts.length >= 4) {
+        return { name: parts[0], creator: parts[1] || 'N/A', verifier: parts[2] || 'N/A', difficulty: parts[3] || 'N/A' };
+      }
+      if (parts.length === 3) {
+        return { name: parts[0], creator: parts[1] || 'N/A', verifier: 'N/A', difficulty: parts[2] || 'N/A' };
+      }
+      if (parts.length === 2) {
+        return { name: parts[0], creator: 'N/A', verifier: 'N/A', difficulty: parts[1] || 'N/A' };
+      }
+      return { name: parts[0] || base, creator: 'N/A', verifier: 'N/A', difficulty: 'N/A' };
+    }
+
+    // Vecchio formato con tilde "~" (mantenuto per compatibilità con asset già caricati)
     if (base.includes('~')) {
       const parts = base.split('~').map(p => p.trim());
       if (parts.length >= 4) {
